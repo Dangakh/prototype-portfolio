@@ -1,0 +1,179 @@
+/* =============================================================================
+   FLUID RESPONSIVE SYSTEM
+   Anchored to a 1440px Figma artboard · 12 columns / 64px margin / 20px gutter
+
+   HOW IT WORKS
+   The root font-size scales linearly with the viewport, so the entire desktop
+   layout behaves like a faithful ZOOM of your 1440 design. Author everything
+   (type AND spacing) in rem, where:
+
+        rem value = (Figma px) / 16
+
+   A 48px heading is 3rem. A 64px margin is 4rem. A 20px gutter is 1.25rem.
+   Below the desktop band you re-anchor the root and reflow to tablet / mobile.
+   ============================================================================= */
+
+/* -----------------------------------------------------------------------------
+   1. RESET
+   -------------------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100vh;
+  font-size: 1rem;          /* 16px @1440 — scales with the root */
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+/* -----------------------------------------------------------------------------
+   2. FLUID ROOT  —  the only thing that is actually "fluid"
+   -----------------------------------------------------------------------------
+   16px @1440  →  proportional preferred value = 16 * 100 / 1440 = 1.1111vw
+     floor : 16 * 1280/1440 = 14.22px   (below this, reflow to tablet)
+     ceil  : 16 * 1920/1440 = 21.33px   (above this, the design freezes)
+
+   Want the desktop band to start lower (e.g. 1024)? Lower the floor — but body
+   text gets small (16 * 1024/1440 = 11.4px), which is exactly why tablet exists.
+   -------------------------------------------------------------------------- */
+:root {
+  font-size: clamp(14.22px, 1.1111vw, 21.33px);
+
+  /* --- Grid tokens (your Figma values ÷ 16) --- */
+  --grid-columns: 12;
+  --grid-margin: 4rem;      /* 64px */
+  --grid-gutter: 1.25rem;   /* 20px */
+  --grid-max: 1920px;       /* hard cap so it freezes + centers on ultrawide */
+
+  /* --- Optional spacing scale (use these or just write raw rem) --- */
+  --space-1: 0.25rem;       /* 4   */
+  --space-2: 0.5rem;        /* 8   */
+  --space-3: 0.75rem;       /* 12  */
+  --space-4: 1rem;          /* 16  */
+  --space-5: 1.5rem;        /* 24  */
+  --space-6: 2rem;          /* 32  */
+  --space-7: 2.5rem;        /* 40  */
+  --space-8: 3rem;          /* 48  */
+  --space-9: 4rem;          /* 64  */
+  --space-10: 6rem;         /* 96  */
+
+  /* --- Optional type scale (edit to match your Figma steps) --- */
+  --text-xs: 0.75rem;       /* 12  */
+  --text-sm: 0.875rem;      /* 14  */
+  --text-base: 1rem;        /* 16  */
+  --text-lg: 1.25rem;       /* 20  */
+  --text-xl: 1.5rem;        /* 24  */
+  --text-2xl: 2rem;         /* 32  */
+  --text-3xl: 2.5rem;       /* 40  */
+  --text-4xl: 3rem;         /* 48  */
+  --text-5xl: 4rem;         /* 64  */
+}
+
+/* -----------------------------------------------------------------------------
+   3. THE GRID  —  reproduces 12 / 64 / 20 exactly, zooms with the root
+   -------------------------------------------------------------------------- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns), 1fr);
+  column-gap: var(--grid-gutter);
+  max-width: var(--grid-max);
+  margin-inline: auto;
+  padding-inline: var(--grid-margin);
+}
+
+/* Span helpers — col-span-6 = half width, etc. */
+.col-span-1  { grid-column: span 1; }
+.col-span-2  { grid-column: span 2; }
+.col-span-3  { grid-column: span 3; }
+.col-span-4  { grid-column: span 4; }
+.col-span-5  { grid-column: span 5; }
+.col-span-6  { grid-column: span 6; }
+.col-span-7  { grid-column: span 7; }
+.col-span-8  { grid-column: span 8; }
+.col-span-9  { grid-column: span 9; }
+.col-span-10 { grid-column: span 10; }
+.col-span-11 { grid-column: span 11; }
+.col-span-12 { grid-column: span 12; }
+.col-full    { grid-column: 1 / -1; }
+
+/* -----------------------------------------------------------------------------
+   4. TABLET  —  re-anchored to your tablet frame (~834px). Tune to your design.
+   -------------------------------------------------------------------------- */
+@media (max-width: 1279.98px) {
+  :root {
+    /* 16px @834 → 1.918vw, clamped readable */
+    font-size: clamp(14.5px, 1.918vw, 18px);
+
+    --grid-columns: 8;
+    --grid-margin: 2rem;      /* 32px */
+    --grid-gutter: 1rem;      /* 16px */
+  }
+
+  /* Default tablet reflow: spans collapse toward half / full.
+     Override per-component as your tablet layout requires. */
+  .col-span-3,
+  .col-span-4 { grid-column: span 4; }
+  .col-span-5,
+  .col-span-6,
+  .col-span-7,
+  .col-span-8 { grid-column: span 8; }
+}
+
+/* -----------------------------------------------------------------------------
+   5. MOBILE  —  re-anchored to your mobile frame (~375px). Tune to your design.
+   -------------------------------------------------------------------------- */
+@media (max-width: 767.98px) {
+  :root {
+    /* 16px @375 → 4.27vw, clamped so body stays ~16px */
+    font-size: clamp(15px, 4.27vw, 17px);
+
+    --grid-columns: 4;
+    --grid-margin: 1.25rem;   /* 20px */
+    --grid-gutter: 1rem;      /* 16px */
+  }
+
+  /* Default mobile reflow: everything stacks full-width. */
+  [class*="col-span-"] { grid-column: 1 / -1; }
+}
+
+/* -----------------------------------------------------------------------------
+   6. ACCESSIBILITY
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

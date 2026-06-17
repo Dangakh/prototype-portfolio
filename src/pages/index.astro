@@ -1,5 +1,9 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { getPageData } from '../lib/sanity';
+import type { Client } from '../lib/sanity';
+
+const { settings, clients } = await getPageData();
 ---
 
 <Layout title="Dang Khoa — Portfolio">
@@ -7,18 +11,18 @@ import Layout from '../layouts/Layout.astro';
 
     <!-- HERO -->
     <section class="hero">
-      <img src="/hero.png" alt="Dang Khoa hero" class="hero-img">
+      <img src="/UpscaledHero.jpeg" alt="Dang Khoa hero" class="hero-img">
       <div class="hero-overlay"></div>
       <div class="hero-grid">
         <div class="logo">Dang<br>Khoa</div>
         <div class="label-num">/ 01</div>
-        <div class="label-role">/ Web Designer &amp; Interactive Experiences</div>
+        <div class="label-role">/ {settings.heroRole}</div>
         <div class="wordmark-wrap">
           <div class="wordmark">DANGA</div>
         </div>
+        <div class="prev-next"><span class="prev">PREV</span> <span class="next">/ NEXT</span></div>
         <div class="hero-right">
-          <p>Craftsmanship that doesn't distract, uniting a trinity of driver, road and vehicled. Inspired by a rich history, engineered for the future.</p>
-          <div class="prev-next"><span class="prev">PREV</span> <span class="next">/ NEXT</span></div>
+          <p>{settings.heroTagline}</p>
         </div>
       </div>
     </section>
@@ -26,22 +30,28 @@ import Layout from '../layouts/Layout.astro';
     <!-- INTRODUCTION -->
     <section class="intro-grid">
       <div class="intro-label">/ Introduction</div>
-      <p class="intro-text">You've arrived at the portfolio of Dang Khoa Nguyen &ndash; a full stack freelance web designer, creative developer and strategist based in Bergen, Norway.</p>
+      <p class="intro-text">{settings.introBio}</p>
     </section>
 
     <!-- WHO I HAVE WORKED WITH -->
     <section class="clients-grid">
       <div class="clients-heading">Who i have<br>worked with</div>
 
-      <div class="client-cell r1c1"><div class="logo-innovasjon"><div class="inn-icon"><span class="inn-dot inn-dot--tl"></span><span class="inn-dot inn-dot--bl"></span><span class="inn-slash"></span></div><div class="inn-name">Innovasjon<br>Norge</div></div></div>
-      <div class="client-cell r1c2"><div class="logo-ntnu"><span class="ntnu-sq"></span><div><div class="ntnu-text">NTNU</div><div class="ntnu-sub">Kunnskap for en bedre verder</div></div></div></div>
-      <div class="client-cell r1c3"><div class="logo-skypass"><svg width="34" height="30" viewBox="0 0 34 30" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M17 3 L31 11 L17 19 L3 11 Z"></path><path d="M3 11 L3 19 L17 27 L17 19"></path><path d="M31 11 L31 19 L17 27"></path></svg><span class="sky-text">SKYPASS</span></div></div>
-      <div class="client-cell r1c4"><div class="logo-innovasjon"><div class="inn-icon"><span class="inn-dot inn-dot--tl"></span><span class="inn-dot inn-dot--bl"></span><span class="inn-slash"></span></div><div class="inn-name">Innovasjon<br>Norge</div></div></div>
-
-      <div class="client-cell r2c1"><div class="logo-innovasjon"><div class="inn-icon"><span class="inn-dot inn-dot--tl"></span><span class="inn-dot inn-dot--bl"></span><span class="inn-slash"></span></div><div class="inn-name">Innovasjon<br>Norge</div></div></div>
-      <div class="client-cell r2c2"><div class="logo-ntnu"><span class="ntnu-sq"></span><div><div class="ntnu-text">NTNU</div><div class="ntnu-sub">Kunnskap for en bedre verder</div></div></div></div>
-      <div class="client-cell r2c3"><div class="logo-skypass"><svg width="34" height="30" viewBox="0 0 34 30" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M17 3 L31 11 L17 19 L3 11 Z"></path><path d="M3 11 L3 19 L17 27 L17 19"></path><path d="M31 11 L31 19 L17 27"></path></svg><span class="sky-text">SKYPASS</span></div></div>
-      <div class="client-cell r2c4"><div class="logo-innovasjon"><div class="inn-icon"><span class="inn-dot inn-dot--tl"></span><span class="inn-dot inn-dot--bl"></span><span class="inn-slash"></span></div><div class="inn-name">Innovasjon<br>Norge</div></div></div>
+      <div class="clients-logo-grid">
+        {clients.map((client: Client) => (
+          <div class="client-cell">
+            {client.logoUrl ? (
+              <img src={client.logoUrl} alt={client.name} class="client-logo-img" />
+            ) : client.logoKey === 'innovasjon-norge' ? (
+              <div class="logo-innovasjon"><div class="inn-icon"><span class="inn-dot inn-dot--tl"></span><span class="inn-dot inn-dot--bl"></span><span class="inn-slash"></span></div><div class="inn-name">Innovasjon<br>Norge</div></div>
+            ) : client.logoKey === 'ntnu' ? (
+              <div class="logo-ntnu"><span class="ntnu-sq"></span><div><div class="ntnu-text">NTNU</div><div class="ntnu-sub">Kunnskap for en bedre verder</div></div></div>
+            ) : client.logoKey === 'skypass' ? (
+              <div class="logo-skypass"><svg width="34" height="30" viewBox="0 0 34 30" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M17 3 L31 11 L17 19 L3 11 Z"></path><path d="M3 11 L3 19 L17 27 L17 19"></path><path d="M31 11 L31 19 L17 27"></path></svg><span class="sky-text">SKYPASS</span></div>
+            ) : null}
+          </div>
+        ))}
+      </div>
     </section>
 
     <!-- EXPERTISE -->
@@ -80,10 +90,10 @@ import Layout from '../layouts/Layout.astro';
     font-family: 'Schibsted Grotesk', sans-serif;
     color: #ededed;
     overflow: hidden;
-    padding-bottom: 120px;
+    padding-bottom: 7.5rem;       /* 120px */
   }
 
-  /* HERO */
+  /* ── HERO ──────────────────────────────────────────────── */
   .hero {
     position: relative;
     width: 100%;
@@ -114,9 +124,9 @@ import Layout from '../layouts/Layout.astro';
     z-index: 3;
     display: grid;
     grid-template-columns: repeat(12, 1fr);
-    column-gap: 20px;
-    grid-template-rows: auto 1fr auto auto;
-    padding: 34px 64px;
+    column-gap: 1.25rem;          /* 20px */
+    grid-template-rows: auto 1fr auto auto auto;
+    padding: 2.125rem 4rem 8rem;  /* 34px 64px 128px */
   }
 
   .logo {
@@ -125,7 +135,7 @@ import Layout from '../layouts/Layout.astro';
     align-self: start;
     font-family: 'Montserrat', sans-serif;
     font-weight: 600;
-    font-size: 21px;
+    font-size: 1.3125rem;         /* 21px */
     line-height: 0.98;
     letter-spacing: -0.01em;
     color: #f6f6f0;
@@ -135,8 +145,8 @@ import Layout from '../layouts/Layout.astro';
     grid-column: 1 / 2;
     grid-row: 3;
     align-self: end;
-    margin-bottom: 16px;
-    font-size: 14.5px;
+    margin-bottom: 1rem;          /* 16px */
+    font-size: 0.906rem;          /* 14.5px */
     letter-spacing: 0.01em;
     color: #e7e3d6;
     white-space: nowrap;
@@ -146,8 +156,8 @@ import Layout from '../layouts/Layout.astro';
     grid-column: 2 / 9;
     grid-row: 3;
     align-self: end;
-    margin-bottom: 16px;
-    font-size: 14.5px;
+    margin-bottom: 1rem;          /* 16px */
+    font-size: 0.906rem;          /* 14.5px */
     letter-spacing: 0.01em;
     color: #bdb9ad;
   }
@@ -167,60 +177,65 @@ import Layout from '../layouts/Layout.astro';
     letter-spacing: -0.01em;
     white-space: nowrap;
     color: #F2EED5;
+    padding-left: 0;
+    margin-left: -1rem;           /* -16px */
+  }
+
+  .prev-next {
+    grid-column: 2 / 8;
+    grid-row: 5;
+    align-self: start;
+    margin-top: 8rem;             /* 128px */
+    font-size: 1.5rem;            /* 24px */
+    letter-spacing: 0.02em;
   }
 
   .hero-right {
     grid-column: 10 / 13;
-    grid-row: 3 / 5;
-    align-self: center;
+    grid-row: 1 / 6;
+    align-self: end;
   }
 
   .hero-right p {
-    font-size: 14.5px;
+    font-size: 1rem;              /* 16px */
     line-height: 1.42;
     color: #d6d2c7;
-  }
-
-  .prev-next {
-    margin-top: 42px;
-    font-size: 14.5px;
-    letter-spacing: 0.02em;
   }
 
   .prev { color: #f0ece0; }
   .next { color: #8f8b80; }
 
-  /* INTRODUCTION */
+  /* ── INTRODUCTION ──────────────────────────────────────── */
   .intro-grid {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
-    column-gap: 20px;
-    padding: 118px 64px 0 64px;
-    row-gap: 42px;
+    column-gap: 1.25rem;          /* 20px */
+    padding: 7.375rem 4rem 0;     /* 118px 64px 0 */
+    row-gap: 2.625rem;            /* 42px */
   }
 
   .intro-label {
     grid-column: 2 / 5;
-    font-size: 14.5px;
+    font-size: 0.906rem;          /* 14.5px */
     color: #8f8b80;
     letter-spacing: 0.01em;
   }
 
   .intro-text {
-    grid-column: 2 / 7;
-    font-size: 41px;
+    grid-column: 2 / 8;
+    font-size: 2.5625rem;         /* 41px */
     line-height: 1.22;
     letter-spacing: -0.015em;
     color: #efece4;
   }
 
-  /* WHO I HAVE WORKED WITH */
+  /* ── WHO I HAVE WORKED WITH ────────────────────────────── */
   .clients-grid {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
-    column-gap: 20px;
-    row-gap: 84px;
-    padding: 248px 64px 0 64px;
+    column-gap: 1.25rem;          /* 20px */
+    row-gap: 5.25rem;             /* 84px */
+    padding: 15.5rem 4rem 0;      /* 248px 64px 0 */
     align-items: center;
   }
 
@@ -228,9 +243,20 @@ import Layout from '../layouts/Layout.astro';
     grid-column: 1 / 4;
     grid-row: 1 / 3;
     align-self: start;
-    font-size: 21px;
+    font-size: 1.3125rem;         /* 21px */
     line-height: 1.25;
     color: #efece4;
+  }
+
+  .clients-logo-grid {
+    grid-column: 5 / 13;
+    grid-row: 1 / 3;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    column-gap: 1.25rem;          /* 20px */
+    row-gap: 5.25rem;             /* 84px */
+    align-content: start;
+    align-items: center;
   }
 
   .client-cell {
@@ -239,34 +265,33 @@ import Layout from '../layouts/Layout.astro';
     color: #dcdcdc;
   }
 
-  .r1c1 { grid-column: 5 / 7; grid-row: 1; }
-  .r1c2 { grid-column: 7 / 9; grid-row: 1; }
-  .r1c3 { grid-column: 9 / 11; grid-row: 1; }
-  .r1c4 { grid-column: 11 / 13; grid-row: 1; }
-  .r2c1 { grid-column: 5 / 7; grid-row: 2; }
-  .r2c2 { grid-column: 7 / 9; grid-row: 2; }
-  .r2c3 { grid-column: 9 / 11; grid-row: 2; }
-  .r2c4 { grid-column: 11 / 13; grid-row: 2; }
+  .client-logo-img {
+    max-height: 2.875rem;         /* 46px */
+    max-width: 8.75rem;           /* 140px */
+    width: auto;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+  }
 
-  /* Innovasjon Norge logo */
+  /* Innovasjon Norge */
   .logo-innovasjon {
     display: flex;
     align-items: center;
-    height: 46px;
-    gap: 11px;
+    height: 2.875rem;             /* 46px */
+    gap: 0.6875rem;               /* 11px */
   }
 
   .inn-icon {
     position: relative;
-    width: 26px;
-    height: 30px;
+    width: 1.625rem;              /* 26px */
+    height: 1.875rem;             /* 30px */
     flex-shrink: 0;
   }
 
   .inn-dot {
     position: absolute;
-    width: 8px;
-    height: 8px;
+    width: 0.5rem;                /* 8px */
+    height: 0.5rem;
     background: currentColor;
   }
 
@@ -277,8 +302,8 @@ import Layout from '../layouts/Layout.astro';
     position: absolute;
     right: 1px;
     top: 0;
-    width: 7px;
-    height: 30px;
+    width: 0.4375rem;             /* 7px */
+    height: 1.875rem;             /* 30px */
     background: currentColor;
     transform: skewX(-16deg);
     transform-origin: bottom;
@@ -287,76 +312,74 @@ import Layout from '../layouts/Layout.astro';
   .inn-name {
     font-family: 'Schibsted Grotesk', sans-serif;
     font-weight: 600;
-    font-size: 17px;
+    font-size: 1.0625rem;         /* 17px */
     line-height: 1.04;
     letter-spacing: -0.01em;
   }
 
-  /* NTNU logo */
+  /* NTNU */
   .logo-ntnu {
     display: flex;
     align-items: center;
-    height: 46px;
-    gap: 9px;
+    height: 2.875rem;             /* 46px */
+    gap: 0.5625rem;               /* 9px */
   }
 
   .ntnu-sq {
-    width: 17px;
-    height: 17px;
+    width: 1.0625rem;             /* 17px */
+    height: 1.0625rem;
     background: currentColor;
-    border-radius: 3px;
+    border-radius: 0.1875rem;     /* 3px */
     flex-shrink: 0;
   }
 
   .ntnu-text {
     font-family: Georgia, 'Times New Roman', serif;
     font-weight: 700;
-    font-size: 24px;
+    font-size: 1.5rem;            /* 24px */
     line-height: 0.9;
     letter-spacing: 0.01em;
   }
 
   .ntnu-sub {
-    font-size: 8.5px;
+    font-size: 0.53125rem;        /* 8.5px */
     letter-spacing: 0.01em;
     color: #9c9c9c;
   }
 
-  /* Skypass logo */
+  /* Skypass */
   .logo-skypass {
     display: flex;
     align-items: center;
-    height: 46px;
-    gap: 12px;
+    height: 2.875rem;             /* 46px */
+    gap: 0.75rem;                 /* 12px */
   }
 
   .sky-text {
     font-weight: 500;
-    font-size: 16px;
+    font-size: 1rem;              /* 16px */
     letter-spacing: 0.22em;
   }
 
-  /* EXPERTISE */
+  /* ── EXPERTISE ─────────────────────────────────────────── */
   .expertise-grid {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
-    column-gap: 20px;
-    padding: 230px 64px 0 64px;
+    column-gap: 1.25rem;          /* 20px */
+    padding: 14.375rem 4rem 0;    /* 230px 64px 0 */
   }
 
   .expertise-text {
     grid-column: 2 / 13;
     font-family: 'Schibsted Grotesk', sans-serif;
     font-weight: 400;
-    font-size: 69px;
+    font-size: 4.3125rem;         /* 69px */
     line-height: 1.16;
     letter-spacing: -0.02em;
     color: #f3f0e8;
   }
 
-  .exp-item {
-    white-space: nowrap;
-  }
+  .exp-item { white-space: nowrap; }
 
   .exp-item sup {
     font-size: 0.34em;
@@ -376,9 +399,9 @@ import Layout from '../layouts/Layout.astro';
   .exp-link {
     display: inline-flex;
     align-items: center;
-    gap: 38px;
-    margin-left: 62px;
-    font-size: 18px;
+    gap: 2.375rem;                /* 38px */
+    margin-left: 3.875rem;        /* 62px */
+    font-size: 1.125rem;          /* 18px */
     letter-spacing: 0.01em;
     color: #8f8b80;
     vertical-align: middle;
@@ -390,7 +413,75 @@ import Layout from '../layouts/Layout.astro';
   .exp-link:hover { color: #cfcabd; }
 
   .exp-arrow {
-    font-size: 22px;
+    font-size: 1.375rem;          /* 22px */
     line-height: 1;
+  }
+
+  /* ── TABLET (768–1279px) ───────────────────────────────── */
+  @media (max-width: 1279.98px) {
+    .hero-grid {
+      grid-template-columns: repeat(8, 1fr);
+      grid-template-rows: auto 1fr auto auto auto auto;
+      padding: 2rem 2rem 6rem;
+    }
+    .logo        { grid-column: 1 / 4; }
+    .label-num   { grid-column: 1 / 2; }
+    .label-role  { grid-column: 2 / 8; }
+    .wordmark-wrap { grid-column: 1 / 8; }
+    .wordmark    { margin-left: 0; }
+    .prev-next   { grid-column: 1 / 8; margin-top: 4rem; }
+    .hero-right  { grid-column: 1 / 9; grid-row: 6; align-self: start; margin-top: 2rem; }
+
+    .intro-grid  { grid-template-columns: repeat(8, 1fr); padding-inline: 2rem; }
+    .intro-label { grid-column: 1 / 4; }
+    .intro-text  { grid-column: 1 / 9; font-size: 2rem; }
+
+    .clients-grid {
+      grid-template-columns: repeat(8, 1fr);
+      padding: 8rem 2rem 0;
+      row-gap: 3rem;
+    }
+    .clients-heading   { grid-column: 1 / 9; grid-row: 1; align-self: start; }
+    .clients-logo-grid { grid-column: 1 / 9; grid-row: 2; grid-template-columns: repeat(4, 1fr); row-gap: 3rem; }
+
+    .expertise-grid { grid-template-columns: repeat(8, 1fr); padding: 8rem 2rem 0; }
+    .expertise-text { grid-column: 1 / 9; font-size: 3rem; }
+    .exp-link       { margin-left: 2rem; }
+  }
+
+  /* ── MOBILE (<768px) ───────────────────────────────────── */
+  @media (max-width: 767.98px) {
+    .portfolio { padding-bottom: 4rem; }
+
+    .hero-grid {
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: auto 1fr auto auto auto auto;
+      padding: 1.5rem 1.25rem 4rem;
+    }
+    .logo        { grid-column: 1 / 5; }
+    .label-num   { display: none; }
+    .label-role  { grid-column: 1 / 5; }
+    .wordmark-wrap { grid-column: 1 / 5; }
+    .wordmark    { margin-left: 0; }
+    .prev-next   { grid-column: 1 / 5; margin-top: 2rem; font-size: 1.25rem; }
+    .hero-right  { grid-column: 1 / 5; grid-row: 6; align-self: start; margin-top: 2rem; }
+    .hero-right p { font-size: 1rem; }
+
+    .intro-grid  { grid-template-columns: repeat(4, 1fr); padding: 4rem 1.25rem 0; row-gap: 1.5rem; }
+    .intro-label { grid-column: 1 / 5; }
+    .intro-text  { grid-column: 1 / 5; font-size: 1.75rem; }
+
+    .clients-grid {
+      grid-template-columns: repeat(4, 1fr);
+      padding: 5rem 1.25rem 0;
+      row-gap: 2.5rem;
+    }
+    .clients-heading   { grid-column: 1 / 5; grid-row: 1; }
+    .clients-logo-grid { grid-column: 1 / 5; grid-row: 2; grid-template-columns: repeat(2, 1fr); row-gap: 2.5rem; }
+
+    .expertise-grid { grid-template-columns: repeat(4, 1fr); padding: 5rem 1.25rem 0; }
+    .expertise-text { grid-column: 1 / 5; font-size: 2rem; }
+    .exp-item       { white-space: normal; }
+    .exp-link       { display: flex; margin-left: 0; margin-top: 1.5rem; font-size: 1rem; }
   }
 </style>
