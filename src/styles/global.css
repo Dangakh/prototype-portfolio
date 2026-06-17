@@ -10,21 +10,12 @@
 }
 
 :root {
-  --background: #fafaf9;
-  --foreground: #1c1917;
-  --muted: #78716c;
-  --accent: #dc2626;
-  --font-display: "Space Grotesk", sans-serif;
-  --font-body: "DM Sans", sans-serif;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #fafaf9;
-    --muted: #78716c;
-    --accent: #f87171;
-  }
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --muted: #8f8b80;
+  --accent: #F2EED5;
+  --font-display: "Montserrat", sans-serif;
+  --font-body: "Schibsted Grotesk", sans-serif;
 }
 
 body {
