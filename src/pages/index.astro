@@ -79,6 +79,47 @@ const { settings, clients } = await getPageData();
   </div>
 </Layout>
 
+<script is:inline>
+  (function () {
+    var mm = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    function runHeroAnimation() {
+      var tl = gsap.timeline({
+        defaults: { ease: 'power3.out' },
+      });
+
+      // Background image: subtle scale-down + fade in
+      tl.from('.hero-img', { scale: 1.06, autoAlpha: 0, duration: 2.0, ease: 'power2.out' }, 0);
+
+      // Gradient overlay fades in
+      tl.from('.hero-overlay', { autoAlpha: 0, duration: 1.4 }, 0.1);
+
+      // Logo: slides down from above
+      tl.from('.logo', { y: -10, autoAlpha: 0, duration: 0.75 }, 0.55);
+
+      // Role labels slide up
+      tl.from('.label-num', { y: 10, autoAlpha: 0, duration: 0.65 }, 0.7);
+      tl.from('.label-role', { y: 10, autoAlpha: 0, duration: 0.65 }, 0.78);
+
+      // Right-side tagline drifts in from the right
+      tl.from('.hero-right p', { x: 16, autoAlpha: 0, duration: 0.8 }, 0.82);
+
+      // Wordmark — the centrepiece, big and dramatic
+      tl.from('.wordmark', { y: 32, autoAlpha: 0, duration: 1.05, ease: 'power4.out' }, 0.9);
+
+      // PREV / NEXT fades up last
+      tl.from('.prev-next', { y: 10, autoAlpha: 0, duration: 0.6 }, 1.12);
+    }
+
+    if (mm.matches) {
+      // Respect reduced-motion: snap everything visible immediately
+      gsap.set(['.hero-img', '.hero-overlay', '.logo', '.label-num', '.label-role', '.wordmark', '.hero-right p', '.prev-next'], { autoAlpha: 1 });
+    } else {
+      document.addEventListener('DOMContentLoaded', runHeroAnimation);
+    }
+  })();
+</script>
+
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   ::selection { background: #F2EED5; color: #0a0a0a; }
