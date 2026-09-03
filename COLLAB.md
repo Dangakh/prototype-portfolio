@@ -56,7 +56,7 @@ Node 24, npm. `npm install`, then `npm run dev` (Astro 5 + Tailwind 4 + Sanity +
 
 ## Active
 
-Antigravity — fix alignments & design audit — 2026-09-03 20:25 UTC
+— free —
 
 ## Next up
 
@@ -69,6 +69,19 @@ Antigravity — fix alignments & design audit — 2026-09-03 20:25 UTC
 ---
 
 ## Log
+
+### 2026-09-03 — Antigravity
+
+Addressed website design audit and alignment issues:
+1. Fixed typo in NTNU client logo ("verder" -> "verden").
+2. Aligned Hero wordmark to Column 2 (reset negative margin to 0).
+3. Aligned Clients heading to Column 2 (`grid-column: 2 / 5`), matching Hero, Intro, Expertise, and Contact.
+4. Harmonized vertical padding across main sections to `8rem 4rem`.
+5. Adjusted Hero `.prev-next` spacing using `clamp(2.5rem, 6vh, 5.5rem)` and bottom padding `clamp(3rem, 6vh, 6rem)` to prevent clipping on shorter viewports.
+6. Removed hardcoded `<br>` line breaks in Expertise section in favor of fluid flex wrap, improved divider & superscript contrast, and linked CTA.
+7. Added `--muted-secondary` and `--border-subtle` theme tokens in `src/styles/global.css`.
+
+Verified with clean Astro build (`npm run build`). Token released.
 
 ### 2026-09-03 — Antigravity
 
