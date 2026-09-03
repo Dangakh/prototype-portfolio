@@ -117,16 +117,15 @@ const heroSlides = [
         <span class="exp-item">Digital Strategy<sup>01</sup></span>
         <span class="exp-div">/</span>
         <span class="exp-item">Branding<sup>02</sup></span>
-        <br>
+        <span class="exp-div">/</span>
         <span class="exp-item">Web + App Development<sup>03</sup></span>
         <span class="exp-div">/</span>
-        <br>
         <span class="exp-item">User Experience<sup>04</sup></span>
         <span class="exp-div">/</span>
         <span class="exp-item">Digital Marketing<sup>05</sup></span>
-        <br>
+        <span class="exp-div">/</span>
         <span class="exp-item">Media Production<sup>06</sup></span>
-        <a href="#" class="exp-link">
+        <a href="mailto:khoa@khoa.studio" class="exp-link">
           <span>Explore all Expertise</span>
           <span class="exp-arrow">&rarr;</span>
         </a>
@@ -585,7 +584,7 @@ const heroSlides = [
 
   .client-cell {
     justify-self: center;
-    opacity: 0.62;
+    opacity: 0.75;
     color: #dcdcdc;
     transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   }
@@ -716,30 +715,31 @@ const heroSlides = [
   .exp-item:hover { color: #ffffff; }
 
   .exp-item sup {
-    font-size: 0.34em;
+    font-size: 0.38em;
     font-weight: 400;
-    top: -1.4em;
-    color: #8f8b80;
+    top: -1.3em;
+    color: var(--muted-secondary, #bdb9ad);
     margin-left: 0.05em;
     vertical-align: super;
   }
 
   .exp-div {
-    color: #6f6b61;
-    margin: 0 0.16em;
+    color: var(--muted, #8f8b80);
+    margin: 0 0.2em;
     font-weight: 300;
+    opacity: 0.7;
   }
 
   .exp-link {
     display: inline-flex;
     align-items: center;
-    gap: 2.375rem;                /* 38px */
-    margin-left: 3.875rem;        /* 62px */
+    gap: 1.5rem;
+    margin-left: 2.5rem;
     font-size: 1.125rem;          /* 18px */
     letter-spacing: 0.01em;
-    color: #8f8b80;
+    color: var(--muted, #8f8b80);
     vertical-align: middle;
-    transform: translateY(-6px);
+    transform: translateY(-4px);
     text-decoration: none;
     transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
