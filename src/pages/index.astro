@@ -4,38 +4,95 @@ import { getPageData } from '../lib/sanity';
 import type { Client } from '../lib/sanity';
 
 const { settings, clients } = await getPageData();
+
+// Hero slideshow. Slide 1 is the intro (fed by Sanity siteSettings).
+// Slides 2-4 are highlighted client projects, hardcoded for now with
+// placeholder taglines + imagery; they can move into Sanity later.
+const heroSlides = [
+  {
+    num: '01',
+    role: settings.heroRole,
+    heading: 'Dang Khoa Nguyen',
+    tagline: settings.heroTagline,
+    image: '/UpscaledHero.jpeg',
+    alt: 'Dang Khoa working on a laptop on a hilltop above the clouds',
+    size: 'lg',
+  },
+  {
+    num: '02',
+    role: 'Web Platform / Product Design',
+    heading: 'Skypass',
+    tagline: 'A calm, end-to-end booking experience for travellers who move between cities and seasons.',
+    image: '/projects/skypass.jpg',
+    alt: 'Ski lift chairs hanging in teal fog, placeholder visual for the Skypass project',
+    size: 'lg',
+  },
+  {
+    num: '03',
+    role: 'Branding / Digital Strategy',
+    heading: 'Innovasjon Norge',
+    tagline: 'Digital storytelling and brand work supporting Norwegian innovation on the international stage.',
+    image: '/projects/innovasjon.jpg',
+    alt: 'Sunlight breaking through a Nordic pine forest, placeholder visual for the Innovasjon Norge project',
+    size: 'sm',
+  },
+  {
+    num: '04',
+    role: 'Media Production / UX',
+    heading: 'NTNU',
+    tagline: 'Media production and user experience work for one of the largest universities in Norway.',
+    image: '/projects/ntnu.jpg',
+    alt: 'Dark macro texture of water droplets, placeholder visual for the NTNU project',
+    size: 'lg',
+  },
+];
 ---
 
-<Layout title="Dang Khoa — Portfolio">
+<Layout title="Dang Khoa Nguyen - Portfolio">
   <div class="portfolio">
 
     <!-- HERO -->
-    <section class="hero">
-      <img src="/UpscaledHero.jpeg" alt="Dang Khoa hero" class="hero-img">
+    <section class="hero panel panel--stick" id="hero">
+      {heroSlides.map((slide, i) => (
+        <img
+          src={slide.image}
+          alt={slide.alt}
+          class="hero-img"
+          data-hero-img={i}
+          loading={i === 0 ? 'eager' : 'lazy'}
+          fetchpriority={i === 0 ? 'high' : 'auto'}
+          aria-hidden={i === 0 ? undefined : 'true'}
+        />
+      ))}
       <div class="hero-overlay"></div>
       <div class="hero-grid">
         <div class="logo">Dang<br>Khoa</div>
-        <div class="label-num">/ 01</div>
-        <div class="label-role">/ {settings.heroRole}</div>
-        <div class="wordmark-wrap">
-          <div class="wordmark">Dang Khoa Nguyen</div>
+        <div class="label-num" data-hero-num>/ {heroSlides[0].num}</div>
+        <div class="label-role" data-hero-role>/ {heroSlides[0].role}</div>
+        <div class="wordmark-wrap" aria-live="polite">
+          <h1 class="wordmark" data-hero-heading data-size={heroSlides[0].size}>{heroSlides[0].heading}</h1>
         </div>
-        <div class="prev-next"><span class="prev">PREV</span> <span class="next">/ NEXT</span></div>
+        <div class="prev-next">
+          <button type="button" class="hero-nav prev" data-hero-prev aria-label="Previous highlight">PREV</button>
+          <span class="nav-sep">/</span>
+          <button type="button" class="hero-nav next" data-hero-next aria-label="Next highlight">NEXT</button>
+          <span class="num-inline" data-hero-num>/ {heroSlides[0].num}</span>
+        </div>
         <div class="hero-right">
-          <p>{settings.heroTagline}</p>
+          <p data-hero-tagline>{heroSlides[0].tagline}</p>
         </div>
       </div>
     </section>
 
     <!-- INTRODUCTION -->
-    <section class="intro-grid">
+    <section class="intro-grid panel">
       <div class="intro-label">/ Introduction</div>
-      <p class="intro-text">{settings.introBio}</p>
+      <p class="intro-text reveal">{settings.introBio}</p>
     </section>
 
     <!-- WHO I HAVE WORKED WITH -->
-    <section class="clients-grid">
-      <div class="clients-heading">Who i have<br>worked with</div>
+    <section class="clients-grid panel">
+      <div class="clients-heading reveal">Who i have<br>worked with</div>
 
       <div class="clients-logo-grid">
         {clients.map((client: Client) => (
@@ -55,7 +112,7 @@ const { settings, clients } = await getPageData();
     </section>
 
     <!-- EXPERTISE -->
-    <section class="expertise-grid">
+    <section class="expertise-grid panel">
       <div class="expertise-text">
         <span class="exp-item">Digital Strategy<sup>01</sup></span>
         <span class="exp-div">/</span>
@@ -76,46 +133,190 @@ const { settings, clients } = await getPageData();
       </div>
     </section>
 
+    <!-- CONTACT -->
+    <section class="contact-grid panel">
+      <div class="contact-label">/ Contact</div>
+      <h2 class="contact-heading reveal">Let's work<br>together</h2>
+      <a href="mailto:khoa@khoa.studio" class="contact-link reveal">
+        <span>khoa@khoa.studio</span>
+        <span class="contact-arrow">&rarr;</span>
+      </a>
+      <footer class="footer">
+        <span>&copy; 2026 Dang Khoa Nguyen</span>
+      </footer>
+    </section>
+
   </div>
 </Layout>
 
+<script type="application/json" id="hero-data" is:inline set:html={JSON.stringify(heroSlides)}></script>
+
 <script is:inline>
   (function () {
-    var mm = window.matchMedia('(prefers-reduced-motion: reduce)');
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var heroTargets = ['.hero-img:first-of-type', '.hero-overlay', '.logo', '.label-num', '.label-role', '.wordmark', '.hero-right p', '.prev-next'];
 
+    /* ── Hero entrance ─────────────────────────────────────── */
     function runHeroAnimation() {
-      var tl = gsap.timeline({
-        defaults: { ease: 'power3.out' },
-      });
+      var tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
-      // Background image: subtle scale-down + fade in
-      tl.from('.hero-img', { scale: 1.06, autoAlpha: 0, duration: 2.0, ease: 'power2.out' }, 0);
-
-      // Gradient overlay fades in
+      tl.from('.hero-img:first-of-type', { scale: 1.06, autoAlpha: 0, duration: 2.0, ease: 'power2.out' }, 0);
       tl.from('.hero-overlay', { autoAlpha: 0, duration: 1.4 }, 0.1);
-
-      // Logo: slides down from above
       tl.from('.logo', { y: -10, autoAlpha: 0, duration: 0.75 }, 0.55);
-
-      // Role labels slide up
       tl.from('.label-num', { y: 10, autoAlpha: 0, duration: 0.65 }, 0.7);
       tl.from('.label-role', { y: 10, autoAlpha: 0, duration: 0.65 }, 0.78);
-
-      // Right-side tagline drifts in from the right
       tl.from('.hero-right p', { x: 16, autoAlpha: 0, duration: 0.8 }, 0.82);
-
-      // Wordmark — the centrepiece, big and dramatic
       tl.from('.wordmark', { y: 32, autoAlpha: 0, duration: 1.05, ease: 'power4.out' }, 0.9);
-
-      // PREV / NEXT fades up last
       tl.from('.prev-next', { y: 10, autoAlpha: 0, duration: 0.6 }, 1.12);
     }
 
-    if (mm.matches) {
-      // Respect reduced-motion: snap everything visible immediately
-      gsap.set(['.hero-img', '.hero-overlay', '.logo', '.label-num', '.label-role', '.wordmark', '.hero-right p', '.prev-next'], { autoAlpha: 1 });
+    /* ── Hero slideshow ────────────────────────────────────── */
+    function initSlideshow() {
+      var slides = JSON.parse(document.getElementById('hero-data').textContent);
+      var imgs = Array.prototype.slice.call(document.querySelectorAll('[data-hero-img]'));
+      var numEls = Array.prototype.slice.call(document.querySelectorAll('[data-hero-num]'));
+      var roleEl = document.querySelector('[data-hero-role]');
+      var headingEl = document.querySelector('[data-hero-heading]');
+      var tagEl = document.querySelector('[data-hero-tagline]');
+      var current = 0;
+      var animating = false;
+
+      function setText(i) {
+        numEls.forEach(function (el) { el.textContent = '/ ' + slides[i].num; });
+        roleEl.textContent = '/ ' + slides[i].role;
+        headingEl.textContent = slides[i].heading;
+        headingEl.setAttribute('data-size', slides[i].size);
+        tagEl.textContent = slides[i].tagline;
+      }
+
+      function setImage(prev, next) {
+        imgs[prev].setAttribute('aria-hidden', 'true');
+        imgs[next].removeAttribute('aria-hidden');
+      }
+
+      function goTo(target) {
+        var idx = ((target % slides.length) + slides.length) % slides.length;
+        if (animating || idx === current) return;
+        var prev = current;
+        current = idx;
+
+        if (reduce || !window.gsap) {
+          imgs[prev].style.opacity = '0';
+          imgs[idx].style.opacity = '1';
+          setImage(prev, idx);
+          setText(idx);
+          return;
+        }
+
+        animating = true;
+        var textOut = [roleEl, headingEl, tagEl];
+        var tl = gsap.timeline({
+          onComplete: function () {
+            gsap.set(imgs[prev], { autoAlpha: 0 });
+            gsap.set(imgs[idx], { zIndex: 0 });
+            animating = false;
+          },
+        });
+
+        // Out: current text lifts away
+        tl.to(textOut, { y: -18, autoAlpha: 0, duration: 0.4, ease: 'power2.in', stagger: 0.05 }, 0);
+        tl.to(numEls, { y: -10, autoAlpha: 0, duration: 0.3, ease: 'power2.in' }, 0);
+
+        // Crossfade: incoming image scales down into place on top
+        tl.set(imgs[idx], { zIndex: 1, autoAlpha: 0, scale: 1.06 }, 0);
+        tl.call(function () { setImage(prev, idx); }, null, 0.1);
+        tl.to(imgs[idx], { autoAlpha: 1, scale: 1, duration: 1.2, ease: 'power2.out' }, 0.1);
+
+        // Swap content, then mirror the entrance
+        tl.call(function () { setText(idx); }, null, 0.48);
+        tl.fromTo(numEls, { y: 12, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.5, ease: 'power3.out' }, 0.55);
+        tl.fromTo(roleEl, { y: 14, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.55, ease: 'power3.out' }, 0.6);
+        tl.fromTo(headingEl, { y: 34, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.85, ease: 'power4.out' }, 0.58);
+        tl.fromTo(tagEl, { x: 16, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: 0.6, ease: 'power3.out' }, 0.66);
+      }
+
+      document.querySelector('[data-hero-prev]').addEventListener('click', function () { goTo(current - 1); });
+      document.querySelector('[data-hero-next]').addEventListener('click', function () { goTo(current + 1); });
+
+      document.addEventListener('keydown', function (e) {
+        // The hero is sticky, so use scroll position (not its rect) to
+        // decide whether it is still the section on screen.
+        if (window.scrollY > window.innerHeight * 0.6) return;
+        if (e.key === 'ArrowRight') goTo(current + 1);
+        if (e.key === 'ArrowLeft') goTo(current - 1);
+      });
+    }
+
+    /* ── Section overlap + scroll reveals ──────────────────── */
+    function initScrollEffects() {
+      if (!window.ScrollTrigger) return;
+      gsap.registerPlugin(ScrollTrigger);
+
+      // Unmask on scroll: every .panel--stick pins (CSS sticky) while the
+      // next section slides over it; this scrub dims the pinned panel as
+      // it gets covered. No scale: the panel must stay full-bleed. The
+      // dim starts only after the next section has covered ~25% of the
+      // viewport. To extend the effect to more sections, just add the
+      // panel--stick class to them.
+      gsap.utils.toArray('.panel--stick').forEach(function (panel) {
+        var next = panel.nextElementSibling;
+        if (!next) return;
+        gsap.to(panel, {
+          opacity: 0.3,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: next,
+            start: 'top 75%',
+            end: 'top top',
+            scrub: true,
+          },
+        });
+      });
+
+      // Inner reveals
+      gsap.utils.toArray('.reveal').forEach(function (el) {
+        gsap.from(el, {
+          y: 36,
+          autoAlpha: 0,
+          duration: 0.9,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: el, start: 'top 85%', once: true },
+        });
+      });
+
+      gsap.from('.client-cell', {
+        y: 24,
+        autoAlpha: 0,
+        duration: 0.7,
+        ease: 'power3.out',
+        stagger: 0.08,
+        scrollTrigger: { trigger: '.clients-logo-grid', start: 'top 82%', once: true },
+      });
+
+      gsap.from('.exp-item', {
+        y: 28,
+        autoAlpha: 0,
+        duration: 0.8,
+        ease: 'power3.out',
+        stagger: 0.07,
+        scrollTrigger: { trigger: '.expertise-text', start: 'top 80%', once: true },
+      });
+    }
+
+    function init() {
+      initSlideshow();
+      if (reduce || !window.gsap) {
+        if (window.gsap) gsap.set(heroTargets, { autoAlpha: 1 });
+        return;
+      }
+      runHeroAnimation();
+      initScrollEffects();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
     } else {
-      document.addEventListener('DOMContentLoaded', runHeroAnimation);
+      init();
     }
   })();
 </script>
@@ -130,15 +331,39 @@ const { settings, clients } = await getPageData();
     min-height: 100vh;
     font-family: 'Schibsted Grotesk', sans-serif;
     color: #ededed;
-    overflow: hidden;
-    padding-bottom: 7.5rem;       /* 120px */
+    overflow-x: clip;
+  }
+
+  /* ── STACKING PANELS ───────────────────────────────────────
+     Every section is a .panel (opaque, isolated stacking layer).
+     Add .panel--stick to a section to pin it so the NEXT section
+     scrolls over it and unmasks it (currently: hero only).
+     The scrub dim/scale in the script picks it up automatically. */
+  .panel {
+    position: relative;
+    isolation: isolate;
+    background: #0a0a0a;
+  }
+
+  .panel--stick {
+    min-height: 100vh;
+    min-height: 100svh;
+  }
+
+  .panel--stick + .panel {
+    box-shadow: 0 -60px 120px -30px rgba(0, 0, 0, 0.9);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .panel--stick { position: sticky; top: 0; }
   }
 
   /* ── HERO ──────────────────────────────────────────────── */
   .hero {
-    position: relative;
     width: 100%;
     height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
   }
 
   .hero-img {
@@ -149,14 +374,20 @@ const { settings, clients } = await getPageData();
     object-fit: cover;
     object-position: center 5%;
     z-index: 0;
+    opacity: 0;
+    will-change: transform, opacity;
   }
+
+  .hero-img:first-of-type { opacity: 1; }
 
   .hero-overlay {
     position: absolute;
     inset: 0;
     z-index: 1;
     pointer-events: none;
-    background: linear-gradient(to top, rgba(10,10,10,0.92) 0%, rgba(10,10,10,0.15) 38%, rgba(10,10,10,0) 62%);
+    background:
+      linear-gradient(to top, rgba(10,10,10,0.94) 0%, rgba(10,10,10,0.28) 40%, rgba(10,10,10,0.06) 64%),
+      linear-gradient(rgba(10,10,10,0.16), rgba(10,10,10,0.16));
   }
 
   .hero-grid {
@@ -221,13 +452,67 @@ const { settings, clients } = await getPageData();
     margin-left: -1rem;           /* -16px */
   }
 
+  .wordmark[data-size="sm"] { font-size: 5.25rem; }
+
   .prev-next {
     grid-column: 2 / 8;
     grid-row: 5;
     align-self: start;
     margin-top: 8rem;             /* 128px */
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
     font-size: 1.5rem;            /* 24px */
     letter-spacing: 0.02em;
+  }
+
+  .hero-nav {
+    font: inherit;
+    letter-spacing: inherit;
+    background: none;
+    border: none;
+    padding: 0.25rem 0;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .hero-nav::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .hero-nav:hover::after,
+  .hero-nav:focus-visible::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  .hero-nav:active { transform: translateY(1px); }
+
+  .hero-nav:focus-visible {
+    outline: 1px solid #F2EED5;
+    outline-offset: 4px;
+  }
+
+  .prev { color: #f0ece0; }
+  .next { color: #8f8b80; }
+  .next:hover, .next:focus-visible { color: #f0ece0; }
+  .nav-sep { color: #8f8b80; }
+
+  .num-inline {
+    display: none;
+    margin-left: auto;
+    font-size: 0.906rem;
+    color: #e7e3d6;
   }
 
   .hero-right {
@@ -242,15 +527,13 @@ const { settings, clients } = await getPageData();
     color: #d6d2c7;
   }
 
-  .prev { color: #f0ece0; }
-  .next { color: #8f8b80; }
-
   /* ── INTRODUCTION ──────────────────────────────────────── */
   .intro-grid {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
     column-gap: 1.25rem;          /* 20px */
-    padding: 7.375rem 4rem 0;     /* 118px 64px 0 */
+    align-content: center;
+    padding: 8rem 4rem;
     row-gap: 2.625rem;            /* 42px */
   }
 
@@ -275,7 +558,8 @@ const { settings, clients } = await getPageData();
     grid-template-columns: repeat(12, 1fr);
     column-gap: 1.25rem;          /* 20px */
     row-gap: 5.25rem;             /* 84px */
-    padding: 15.5rem 4rem 0;      /* 248px 64px 0 */
+    align-content: center;
+    padding: 9rem 4rem;
     align-items: center;
   }
 
@@ -303,7 +587,10 @@ const { settings, clients } = await getPageData();
     justify-self: center;
     opacity: 0.62;
     color: #dcdcdc;
+    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   }
+
+  .client-cell:hover { opacity: 1; }
 
   .client-logo-img {
     max-height: 2.875rem;         /* 46px */
@@ -406,7 +693,8 @@ const { settings, clients } = await getPageData();
     display: grid;
     grid-template-columns: repeat(12, 1fr);
     column-gap: 1.25rem;          /* 20px */
-    padding: 14.375rem 4rem 0;    /* 230px 64px 0 */
+    align-content: center;
+    padding: 9rem 4rem;
   }
 
   .expertise-text {
@@ -419,7 +707,13 @@ const { settings, clients } = await getPageData();
     color: #f3f0e8;
   }
 
-  .exp-item { white-space: nowrap; }
+  .exp-item {
+    white-space: nowrap;
+    display: inline-block;
+    transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .exp-item:hover { color: #ffffff; }
 
   .exp-item sup {
     font-size: 0.34em;
@@ -447,14 +741,107 @@ const { settings, clients } = await getPageData();
     vertical-align: middle;
     transform: translateY(-6px);
     text-decoration: none;
-    transition: color 0.2s;
+    transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .exp-link:hover { color: #cfcabd; }
 
+  .exp-link:focus-visible {
+    outline: 1px solid #F2EED5;
+    outline-offset: 4px;
+  }
+
   .exp-arrow {
     font-size: 1.375rem;          /* 22px */
     line-height: 1;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .exp-link:hover .exp-arrow { transform: translateX(6px); }
+
+  /* ── CONTACT ───────────────────────────────────────────── */
+  .contact-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    column-gap: 1.25rem;          /* 20px */
+    align-content: center;
+    row-gap: 2.625rem;            /* 42px */
+    padding: 9rem 4rem 2.5rem;
+  }
+
+  .contact-label {
+    grid-column: 2 / 5;
+    font-size: 0.906rem;          /* 14.5px */
+    color: #8f8b80;
+    letter-spacing: 0.01em;
+  }
+
+  .contact-heading {
+    grid-column: 2 / 11;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    font-size: 6rem;              /* 96px */
+    line-height: 0.94;
+    letter-spacing: -0.015em;
+    color: #F2EED5;
+  }
+
+  .contact-link {
+    grid-column: 2 / 9;
+    display: inline-flex;
+    align-items: center;
+    gap: 1.5rem;
+    justify-self: start;
+    font-size: 1.75rem;           /* 28px */
+    letter-spacing: 0.01em;
+    color: #efece4;
+    text-decoration: none;
+    position: relative;
+    transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .contact-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -6px;
+    width: 100%;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .contact-link:hover::after,
+  .contact-link:focus-visible::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  .contact-link:focus-visible {
+    outline: 1px solid #F2EED5;
+    outline-offset: 6px;
+  }
+
+  .contact-arrow {
+    font-size: 1.5rem;
+    line-height: 1;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .contact-link:hover .contact-arrow { transform: translateX(6px); }
+
+  .footer {
+    grid-column: 1 / 13;
+    margin-top: 6rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;          /* 14px */
+    color: #8f8b80;
+    letter-spacing: 0.01em;
   }
 
   /* ── TABLET (768–1279px) ───────────────────────────────── */
@@ -468,7 +855,8 @@ const { settings, clients } = await getPageData();
     .label-num   { grid-column: 1 / 2; }
     .label-role  { grid-column: 2 / 8; }
     .wordmark-wrap { grid-column: 1 / 8; }
-    .wordmark    { margin-left: 0; }
+    .wordmark    { margin-left: 0; font-size: 6.5rem; }
+    .wordmark[data-size="sm"] { font-size: 4.25rem; }
     .prev-next   { grid-column: 1 / 8; margin-top: 4rem; }
     .hero-right  { grid-column: 1 / 9; grid-row: 6; align-self: start; margin-top: 2rem; }
 
@@ -478,21 +866,25 @@ const { settings, clients } = await getPageData();
 
     .clients-grid {
       grid-template-columns: repeat(8, 1fr);
-      padding: 8rem 2rem 0;
+      padding: 6rem 2rem;
       row-gap: 3rem;
     }
     .clients-heading   { grid-column: 1 / 9; grid-row: 1; align-self: start; }
     .clients-logo-grid { grid-column: 1 / 9; grid-row: 2; grid-template-columns: repeat(4, 1fr); row-gap: 3rem; }
 
-    .expertise-grid { grid-template-columns: repeat(8, 1fr); padding: 8rem 2rem 0; }
+    .expertise-grid { grid-template-columns: repeat(8, 1fr); padding: 6rem 2rem; }
     .expertise-text { grid-column: 1 / 9; font-size: 3rem; }
     .exp-link       { margin-left: 2rem; }
+
+    .contact-grid    { grid-template-columns: repeat(8, 1fr); padding: 6rem 2rem 2rem; }
+    .contact-label   { grid-column: 1 / 4; }
+    .contact-heading { grid-column: 1 / 9; font-size: 4rem; }
+    .contact-link    { grid-column: 1 / 9; font-size: 1.375rem; }
+    .footer          { grid-column: 1 / 9; margin-top: 4rem; }
   }
 
   /* ── MOBILE (<768px) ───────────────────────────────────── */
   @media (max-width: 767.98px) {
-    .portfolio { padding-bottom: 4rem; }
-
     .hero-grid {
       grid-template-columns: repeat(4, 1fr);
       grid-template-rows: auto 1fr auto auto auto auto;
@@ -503,25 +895,33 @@ const { settings, clients } = await getPageData();
     .label-role  { grid-column: 1 / 5; }
     .wordmark-wrap { grid-column: 1 / 5; }
     .wordmark    { margin-left: 0; font-size: min(4rem, 8.5vh); }
+    .wordmark[data-size="sm"] { font-size: min(2.875rem, 6.5vh); }
     .prev-next   { grid-column: 1 / 5; margin-top: 0.75rem; font-size: 1.25rem; }
+    .num-inline  { display: inline; }
     .hero-right  { grid-column: 1 / 5; grid-row: 6; align-self: start; margin-top: 0.75rem; }
     .hero-right p { font-size: 0.9375rem; }
 
-    .intro-grid  { grid-template-columns: repeat(4, 1fr); padding: 4rem 1.25rem 0; row-gap: 1.5rem; }
+    .intro-grid  { grid-template-columns: repeat(4, 1fr); padding: 4rem 1.25rem; row-gap: 1.5rem; }
     .intro-label { grid-column: 1 / 5; }
     .intro-text  { grid-column: 1 / 5; font-size: 1.75rem; }
 
     .clients-grid {
       grid-template-columns: repeat(4, 1fr);
-      padding: 5rem 1.25rem 0;
+      padding: 4rem 1.25rem;
       row-gap: 2.5rem;
     }
     .clients-heading   { grid-column: 1 / 5; grid-row: 1; }
     .clients-logo-grid { grid-column: 1 / 5; grid-row: 2; grid-template-columns: repeat(2, 1fr); row-gap: 2.5rem; }
 
-    .expertise-grid { grid-template-columns: repeat(4, 1fr); padding: 5rem 1.25rem 0; }
+    .expertise-grid { grid-template-columns: repeat(4, 1fr); padding: 4rem 1.25rem; }
     .expertise-text { grid-column: 1 / 5; font-size: 2rem; }
     .exp-item       { white-space: normal; }
     .exp-link       { display: flex; margin-left: 0; margin-top: 1.5rem; font-size: 1rem; }
+
+    .contact-grid    { grid-template-columns: repeat(4, 1fr); padding: 4rem 1.25rem 1.5rem; row-gap: 1.5rem; }
+    .contact-label   { grid-column: 1 / 5; }
+    .contact-heading { grid-column: 1 / 5; font-size: 2.75rem; }
+    .contact-link    { grid-column: 1 / 5; font-size: 1.125rem; }
+    .footer          { grid-column: 1 / 5; margin-top: 3rem; font-size: 0.8125rem; }
   }
 </style>
