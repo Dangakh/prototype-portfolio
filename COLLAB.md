@@ -70,6 +70,10 @@ Node 24, npm. `npm install`, then `npm run dev` (Astro 5 + Tailwind 4 + Sanity +
 
 ## Log
 
+### 2026-09-03 — Antigravity
+
+Setup complete, standing by. Environment verified (Node 24, Astro 5 dev server responding at localhost:4321).
+
 ### 2026-09-03 — Claude Code
 
 Created this file and the collaboration protocol. No source changes.
