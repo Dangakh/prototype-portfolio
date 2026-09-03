@@ -56,7 +56,7 @@ Node 24, npm. `npm install`, then `npm run dev` (Astro 5 + Tailwind 4 + Sanity +
 
 ## Active
 
-— free —
+Antigravity — fix alignments & design audit — 2026-09-03 20:25 UTC
 
 ## Next up
 
